@@ -5,6 +5,7 @@
 #include <args.hpp>
 #include <ini.hpp>
 #include <err.hpp>
+#include <build.hpp>
 
 using namespace acbs;
 
@@ -22,7 +23,7 @@ int main(int argc, const char **const argv) {
         return 1;
     }
     const auto proj = std::get<ini::Project>(projRes);
-    std::cout
+    /*std::cout
         << "Using project settings: " << std::endl
         << "[Compiler]" << std::endl
         << "Compiler = " << proj.compiler.compiler << std::endl
@@ -46,17 +47,28 @@ int main(int argc, const char **const argv) {
     }
     std::cout
         << " }" << std::endl
-        << "Build = " << proj.project.build << std::endl;
+        << "Build = " << proj.project.build << std::endl;*/
 
     switch (args.cmd) {
-        case args::Command::Build:
-            std::cout << "TODO: Build" << std::endl;
+        case args::Command::Build: {
+            const auto buildErr = build::build(proj, false);
+            if (buildErr.has_value()) {
+                std::cerr << "Error: " << err::errToString(buildErr.value()) << std::endl;
+                return 1;
+            }
             break;
-        case args::Command::Debug:
-            std::cout << "TODO: Debug" << std::endl;
+        }
+        case args::Command::Debug: {
+            build::clean(proj);
+            const auto buildErr = build::build(proj, true);
+            if (buildErr.has_value()) {
+                std::cerr << "Error: " << err::errToString(buildErr.value()) << std::endl;
+                return 1;
+            }
             break;
+        }
         case args::Command::Clean:
-            std::cout << "TODO: Clean" << std::endl;
+            build::clean(proj);
             break;
     }
     return 0;
