@@ -1,0 +1,8 @@
+# C Build Files
+
+*.o
+*.so
+*.a
+*.bin
+acbs
+
