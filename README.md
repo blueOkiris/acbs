@@ -2,7 +2,7 @@
 
 ## Description
 
-A simple to use build-system for gcc.
+An easy to use build-system for C.
 
 ### Motivation
 
