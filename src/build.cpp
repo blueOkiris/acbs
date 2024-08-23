@@ -60,7 +60,14 @@ std::optional<err::AcbsErr> acbs::build::build(const ini::Project &proj, const b
 }
 
 void acbs::build::clean(const ini::Project &proj) {
-    std::cout << "Not implemented" << std::endl;
+    try {
+        std::cout << "Removing " << proj.project.build << std::endl;
+        std::filesystem::remove_all(proj.project.build);
+    } catch(...) {}
+    try {
+        std::cout << "Removing " << proj.project.name << std::endl;
+        std::filesystem::remove_all(proj.project.name);
+    } catch(...) {}
 }
 
 static std::vector<std::pair<std::filesystem::path, std::filesystem::path>> getDeltaFiles(

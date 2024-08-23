@@ -59,7 +59,7 @@ int main(int argc, const char **const argv) {
         }
         std::cout
             << "Changed into working directory '" << std::filesystem::current_path() << "'"
-            << std::endl;
+            << std::endl << std::endl;
     }
     switch (args.cmd) {
         case args::Command::Build: {
