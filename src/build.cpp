@@ -43,7 +43,7 @@ std::optional<err::AcbsErr> acbs::build::build(const ini::Project &proj, const b
     }
     std::cout << std::endl;
 
-    if (!std::filesystem::exists(proj.project.name) || srcObjZip.size() > 1) {
+    if (!std::filesystem::exists(proj.project.name) || srcObjZip.size() > 0) {
         std::cout << "Linking: " << std::endl;
         const auto linkCmd = linkObjsCmd(proj);
         std::cout << "- Command: '" << linkCmd << "'" << std::endl;
