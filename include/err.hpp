@@ -16,7 +16,9 @@ namespace acbs {
             NoKey,
             KeyOutsideSection,
             UnknownKey,
-            BadValue
+            BadValue,
+            CompileCommand,
+            LinkCommand
         };
 
         struct AcbsErr {
@@ -47,6 +49,10 @@ namespace acbs {
                     return "Unknown key in ini file '" + err.extraInfo + "'";
                 case AcbsErrType::BadValue:
                     return "Bad value in ini file '" + err.extraInfo + "'";
+                case AcbsErrType::CompileCommand:
+                    return "Error compiling file.";
+                case AcbsErrType::LinkCommand:
+                    return "Error linking files.";
             }
         }
     }

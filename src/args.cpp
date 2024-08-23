@@ -18,19 +18,21 @@ std::variant<CliArgs, err::AcbsErr> CliArgs::parse(const int argc, const char **
     }
 
     std::string ini = "acbs.ini";
+    std::string workingDir = ".";
     if (argc == 3) {
         ini = std::string(argv[2]) + "/acbs.ini";
+        workingDir = std::string(argv[2]);
     }
     if (!std::filesystem::exists(ini)) {
         return err::AcbsErr { .type = err::AcbsErrType::NoIniFile, .extraInfo = ini };
     }
 
     if (std::string(argv[1]) == "build") {
-        return CliArgs { .ini = ini, .cmd = Command::Build };
+        return CliArgs { .ini = ini, .cmd = Command::Build, .workingDir = workingDir };
     } else if (std::string(argv[1]) == "debug") {
-        return CliArgs { .ini = ini, .cmd = Command::Debug };
+        return CliArgs { .ini = ini, .cmd = Command::Debug, .workingDir = workingDir };
     } else if (std::string(argv[1]) == "clean") {
-        return CliArgs { .ini = ini, .cmd = Command::Clean };
+        return CliArgs { .ini = ini, .cmd = Command::Clean, .workingDir = workingDir };
     } else {
         return err::AcbsErr {
             .type = err::AcbsErrType::InvalidCommand,

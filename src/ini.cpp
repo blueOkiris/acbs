@@ -12,7 +12,8 @@
 using namespace acbs;
 using namespace acbs::ini;
 
-std::variant<Project, err::AcbsErr> Project::parse(const std::string &fileName) {
+std::variant<Project, err::AcbsErr> Project::parse(
+        const std::string &workingDir, const std::string &fileName) {
     std::ifstream file(fileName);
     if (!file.is_open()) {
         return err::AcbsErr { .type = err::AcbsErrType::NoIniFile, .extraInfo = fileName };
@@ -235,7 +236,8 @@ std::variant<Project, err::AcbsErr> Project::parse(const std::string &fileName) 
             .isCpp = projectIsCpp,
             .include = projectInclude,
             .source = projectSource,
-            .build = projectBuild
+            .build = projectBuild,
+            .workingDir = workingDir
         }
     };
 }

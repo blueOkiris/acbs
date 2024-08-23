@@ -24,11 +24,14 @@ namespace acbs {
             const std::vector<std::string> include;
             const std::vector<std::string> source;
             const std::string build;
+            const std::string workingDir;
         };
 
         struct Project {
             public:
-                static std::variant<Project, err::AcbsErr> parse(const std::string &fileName);
+                static std::variant<Project, err::AcbsErr> parse(
+                    const std::string &workingDir, const std::string &fileName
+                );
 
                 const CompilerSection compiler;
                 const ProjectSection project;
