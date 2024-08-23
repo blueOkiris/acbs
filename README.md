@@ -29,6 +29,15 @@ The .ini format is not properly specified, so I will note how these work:
 
 ### Compiler Settings
 
+TODO - Add the following for more control when doing libraries and not using gcc:
+
+- objoutprefix (default "-o ")
+- incprefix (default "-I")
+- srcprefix ("-c ")
+- linkeroutprefix (default " -o ")
+- linkerflagsafter (default "true")
+- Separate bin linkage, shared library linkage, and static library linkage into different flags since they may use different commands
+
 Under the `[compiler]` section, you can set the following options:
 
 | Option      | Type   | Default           | Description                                                   |
