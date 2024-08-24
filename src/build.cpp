@@ -146,14 +146,16 @@ static std::string linkObjsCmd(const ini::Project &proj) {
     }
 
     std::stringstream cmd;
-    cmd << proj.compiler.linker << " " << proj.compiler.linkeroutpfx << proj.project.name << " ";
+    cmd << proj.compiler.linker << " ";
     if (proj.compiler.linkerflagsafter) {
+        cmd << proj.compiler.linkeroutpfx << proj.project.name << " ";
         for (const auto &obj : objs) {
             cmd << obj << " ";
         }
         cmd << proj.compiler.linkerFlags;
     } else {
-        cmd << proj.compiler.linkerFlags;
+        cmd << proj.compiler.linkerFlags << " ";
+        cmd << proj.compiler.linkeroutpfx << proj.project.name << " ";
         for (const auto &obj : objs) {
             cmd << obj << " ";
         }
