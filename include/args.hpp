@@ -5,6 +5,8 @@
 #include <variant>
 #include <err.hpp>
 
+#define VERSION     3
+
 namespace acbs {
     namespace args {
         enum class Command {
@@ -26,7 +28,7 @@ namespace acbs {
 
         static inline void printUsage(void) {
             std::cout
-                << "ACBS" << std::endl
+                << "ACBS v" << VERSION << std::endl
                 << "by Dylan Turner" << std::endl
                 << std::endl
                 << "Usage:" << std::endl

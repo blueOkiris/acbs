@@ -5,6 +5,7 @@
 #include <optional>
 #include <vector>
 #include <filesystem>
+#include <fstream>
 #include <sstream>
 #include <err.hpp>
 #include <ini.hpp>
@@ -68,6 +69,10 @@ void acbs::build::clean(const ini::Project &proj) {
         std::cout << "Removing " << proj.project.name << std::endl;
         std::filesystem::remove_all(proj.project.name);
     } catch(...) {}
+    try {
+        std::cout << "Removing .hdrfiles/" << std::endl;
+        std::filesystem::remove_all(".hdrfiles");
+    } catch(...) {}
 }
 
 static std::vector<std::pair<std::filesystem::path, std::filesystem::path>> getDeltaFiles(
@@ -86,11 +91,62 @@ static std::vector<std::pair<std::filesystem::path, std::filesystem::path>> getD
         }
     }
 
+    // If any headers have been changed, queue all .o for rebuild
+    std::vector<std::filesystem::path> headerFiles;
+    for (const auto &fldr : proj.project.include) {
+        for (const auto &entry : std::filesystem::directory_iterator(fldr)) {
+            if (entry.is_regular_file()
+                    && (
+                        (proj.project.isCpp && entry.path().extension() == ".hpp")
+                            || (!proj.project.isCpp && entry.path().extension() == ".h")
+                    )) {
+                headerFiles.push_back(entry.path());
+            }
+        }
+    }
+    bool triggerAll = false;
+    for (const auto &header : headerFiles) {
+        if (!std::filesystem::exists(".hdrtimes")) {
+            std::filesystem::create_directory(".hdrtimes");
+            triggerAll = true;
+        }
+        const auto fname = ".hdrtimes/" + header.filename().string();
+        if (!std::filesystem::exists(fname)) {
+            std::ofstream f(fname);
+            f << 0;
+            f.close();
+            triggerAll = true;
+        }
+
+        std::ifstream inHdrtime(fname);
+        auto lastTime = 0;
+        inHdrtime >> lastTime;
+        inHdrtime.close();
+        const auto hdrWriteTime = std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                std::filesystem::last_write_time(header)
+                    - std::filesystem::file_time_type::clock::now()
+                    + std::chrono::system_clock::now()
+            ).time_since_epoch()
+        ).count();
+        if (hdrWriteTime > lastTime) {
+            std::ofstream outHdrTime(fname);
+            outHdrTime << hdrWriteTime;
+            outHdrTime.close();
+            triggerAll = true;
+        }
+    }
+
     // Figure out which files need to be rebuilt
     // If a .c/.cpp file is newer than its .o file OR that .o files doesn't exist, then rebuild
     std::vector<std::pair<std::filesystem::path, std::filesystem::path>> sourceObjZip;
     for (const auto &sourceFile : sourceFiles) {
         const auto objectName = proj.project.build + "/" + sourceFile.stem().string() + ".o";
+
+        if (triggerAll) {
+            sourceObjZip.push_back(std::make_pair(sourceFile, objectName));
+            continue;
+        }
 
         if (!std::filesystem::exists(objectName)) {
             sourceObjZip.push_back(std::make_pair(sourceFile, objectName));
