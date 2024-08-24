@@ -5,7 +5,7 @@
 #include <variant>
 #include <err.hpp>
 
-#define VERSION     4
+#define VERSION     6
 
 namespace acbs {
     namespace args {
