@@ -70,8 +70,8 @@ void acbs::build::clean(const ini::Project &proj) {
         std::filesystem::remove_all(proj.project.name);
     } catch(...) {}
     try {
-        std::cout << "Removing .hdrfiles/" << std::endl;
-        std::filesystem::remove_all(".hdrfiles");
+        std::cout << "Removing .hdrtimes/" << std::endl;
+        std::filesystem::remove_all(".hdrtimes");
     } catch(...) {}
 }
 
