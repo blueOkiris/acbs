@@ -79,6 +79,10 @@ You can optionally specify the folder containing an acbs.ini by providing it as 
 
 Use docker. We have a Dockerfile in the main directory which will build an x86\_64 Linux compatible binary via Debian
 
-Build Image: `docker build -t acbs-bldr .`
-Run Image: `docker run --rm -v .:/proj -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) acbs-bldr`
+Build Image: `docker build --no-cache -t acbs-bldr .`
+Run Image:
+
+- Build: `docker run --rm -v .:/proj -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) acbs-bldr`
+- Debug Build: `docker run -e COMMAND=debug --rm -v .:/proj -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) acbs-bldr`
+- Clean: `docker run -e COMMAND=clean --rm -v .:/proj -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) acbs-bldr`
 
