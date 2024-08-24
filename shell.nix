@@ -19,7 +19,6 @@ in with pkgs; with xorg; mkShell {
     buildInputs = [
         ccls
         gcc
-        gnumake
         pkg-config
     ] ++ buildLibs;
     shellHook = ''

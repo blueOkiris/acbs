@@ -50,7 +50,7 @@ namespace acbs {
                 case AcbsErrType::BadValue:
                     return "Bad value in ini file '" + err.extraInfo + "'";
                 case AcbsErrType::CompileCommand:
-                    return "Error compiling file.";
+                    return "Error compiling file '" + err.extraInfo + "'";
                 case AcbsErrType::LinkCommand:
                     return "Error linking files.";
             }

@@ -5,8 +5,11 @@
 #include <optional>
 #include <vector>
 #include <filesystem>
+#include <mutex>
 #include <fstream>
+#include <map>
 #include <sstream>
+#include <thread>
 #include <err.hpp>
 #include <ini.hpp>
 #include <build.hpp>
@@ -22,6 +25,11 @@ static std::string buildFileCmd(
     const std::filesystem::path &src, const std::filesystem::path &obj
 );
 static std::string linkObjsCmd(const ini::Project &proj);
+static void parallelBuildFile(
+    const ini::Project &proj, const bool isDebug,
+    const std::filesystem::path &src, const std::filesystem::path &obj,
+    std::mutex &resultsMutex, std::map<std::string, bool> &results
+);
 
 std::optional<err::AcbsErr> acbs::build::build(const ini::Project &proj, const bool isDebug) {
     // Get and show the users what files will be built
@@ -32,14 +40,24 @@ std::optional<err::AcbsErr> acbs::build::build(const ini::Project &proj, const b
     }
     std::cout << std::endl;
 
-    for (const auto &srcObj : srcObjZip) {
-        std::cout << "Building " << srcObj.second << ":" << std::endl;
-        const auto cmd = buildFileCmd(proj, isDebug, srcObj.first, srcObj.second);
-        std::cout << "- Command: '" << cmd << "'" << std::endl;
-        const auto result = std::system(cmd.c_str());
-        std::cout << "- Successful: " << (result == 0 ? "Yes" : "No") << std::endl;
-        if (result != 0) {
-            return err::AcbsErr { .type = err::AcbsErrType::CompileCommand, .extraInfo = "" };
+    std::map<std::string, bool> results;
+    std::mutex resultsMutex;
+    std::vector<std::thread> threads;
+    for (const auto& srcObj : srcObjZip) {
+        threads.push_back(std::thread(
+            parallelBuildFile,
+            proj, isDebug, srcObj.first, srcObj.second,
+            std::ref(resultsMutex), std::ref(results)
+        ));
+    }
+    for (auto& t : threads) {
+        t.join();
+    }
+    for (const auto& result : results) {
+        if (!result.second) {
+            return err::AcbsErr {
+                .type = err::AcbsErrType::CompileCommand, .extraInfo = result.first
+            };
         }
     }
     std::cout << std::endl;
@@ -217,5 +235,20 @@ static std::string linkObjsCmd(const ini::Project &proj) {
         }
     }
     return cmd.str();
+}
+
+static void parallelBuildFile(
+        const ini::Project &proj, const bool isDebug,
+        const std::filesystem::path &src, const std::filesystem::path &obj,
+        std::mutex &resultsMutex, std::map<std::string, bool> &results) {
+    const auto cmd = buildFileCmd(proj, isDebug, src, obj);
+    const auto result = std::system(cmd.c_str());
+
+    std::lock_guard<std::mutex> lock(resultsMutex);
+    results[src.string()] = result == 0;
+    std::cout
+        << "Building " << src << ":" << std::endl
+        << "- Command: '" << cmd << "'" << std::endl
+        << "- Successful: " << (result == 0 ? "Yes" : "No") << std::endl;
 }
 
