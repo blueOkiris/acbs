@@ -75,3 +75,10 @@ From a folder with an `acbs.ini` file, run the following commands:
 
 You can optionally specify the folder containing an acbs.ini by providing it as a second argument.
 
+## Build
+
+Use docker. We have a Dockerfile in the main directory which will build an x86\_64 Linux compatible binary via Debian
+
+Build Image: `docker build -t acbs-bldr .`
+Run Image: `docker run --rm -v .:/proj -e HOST_UID=$(id -u) -e HOST_GID=$(id -g) acbs-bldr`
+
