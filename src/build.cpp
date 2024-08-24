@@ -128,11 +128,11 @@ static std::string buildFileCmd(
         << "mkdir -p " << proj.project.build << "&& "
         << proj.compiler.compiler << " "
         << (isDebug ? proj.compiler.debugFlags : proj.compiler.flags) << " "
-        << "-o " << obj << " ";
+        << proj.compiler.objoutpfx << obj << " ";
     for (const auto &incPath : proj.project.include) {
-        cmd << "-I" << incPath << " ";
+        cmd << proj.compiler.incpfx << incPath << " ";
     }
-    cmd << "-c " << src;
+    cmd << proj.compiler.srcpfx << src;
     return cmd.str();
 }
 
@@ -146,11 +146,18 @@ static std::string linkObjsCmd(const ini::Project &proj) {
     }
 
     std::stringstream cmd;
-    cmd << proj.compiler.linker << " -o " << proj.project.name << " ";
-    for (const auto &obj : objs) {
-        cmd << obj << " ";
+    cmd << proj.compiler.linker << " " << proj.compiler.linkeroutpfx << proj.project.name << " ";
+    if (proj.compiler.linkerflagsafter) {
+        for (const auto &obj : objs) {
+            cmd << obj << " ";
+        }
+        cmd << proj.compiler.linkerFlags;
+    } else {
+        cmd << proj.compiler.linkerFlags;
+        for (const auto &obj : objs) {
+            cmd << obj << " ";
+        }
     }
-    cmd << proj.compiler.linkerFlags;
     return cmd.str();
 }
 

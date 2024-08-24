@@ -29,24 +29,20 @@ The .ini format is not properly specified, so I will note how these work:
 
 ### Compiler Settings
 
-TODO - Add the following for more control when doing libraries and not using gcc:
-
-- objoutprefix (default "-o ")
-- incprefix (default "-I")
-- srcprefix ("-c ")
-- linkeroutprefix (default " -o ")
-- linkerflagsafter (default "true")
-- Separate bin linkage, shared library linkage, and static library linkage into different flags since they may use different commands
-
 Under the `[compiler]` section, you can set the following options:
 
-| Option      | Type   | Default           | Description                                                   |
-|:-----------:|:------:|:-----------------:|:-------------------------------------------------------------:|
-| compiler    | String | gcc               | Compiler to use                                               |
-| flags       | String | -O2 -Wall -Werror | Flags to use when building individual C files in release mode |
-| debugflags  | String | -g                | Flags to use when building individual C files in debug mode   |
-| linker      | String | gcc               | Linker to use                                                 |
-| linkerflags | String |                   | Flags to add to linker                                        |
+| Option           | Type   | Default           | Description                                                      |
+|:----------------:|:------:|:-----------------:|:----------------------------------------------------------------:|
+| compiler         | String | gcc               | Compiler to use                                                  |
+| flags            | String | -O2 -Wall -Werror | Flags to use when building individual C files in release mode    |
+| debugflags       | String | -g                | Flags to use when building individual C files in debug mode      |
+| linker           | String | gcc               | Linker to use                                                    |
+| linkerflags      | String |                   | Flags to add to linker                                           |
+| objoutpfx        | String | "-o "             | What to put in front of the .o file name in the compile cmd      |
+| incpfx           | String | "-I"              | What to put in front of include folders in the compile cmd       |
+| srcpfx           | String | "-c "             | What to put in front of the .c/.cpp file name in the compile cmd |
+| linkeroutpfx     | String | "-o "             | What to put in front of the final object name in the link cmd    |
+| linkerflagsafter | Bool   | true              | Whether linker flags go after the object files or before         |
 
 ### Project Settings
 

@@ -15,6 +15,11 @@ namespace acbs {
             const std::string debugFlags;
             const std::string linker;
             const std::string linkerFlags;
+            const std::string objoutpfx;
+            const std::string incpfx;
+            const std::string srcpfx;
+            const std::string linkeroutpfx;
+            const bool linkerflagsafter;
         };
 
         struct ProjectSection {

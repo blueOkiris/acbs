@@ -25,6 +25,11 @@ std::variant<Project, err::AcbsErr> Project::parse(
     std::string compilerDebugFlags =    "-g";
     std::string compilerLinker =        "gcc";
     std::string compilerLinkerFlags =   "";
+    std::string compilerObjOutPfx =     "-o ";
+    std::string compilerIncPfx =        "-I";
+    std::string compilerSrcPfx =        "-c ";
+    std::string compilerLinkerOutPfx =  "-o ";
+    bool compilerLinkerFlagsAfter =     true;
     std::string projectName =           "";
     bool projectIsBin =                 true;
     bool projectIsCpp =                 false;
@@ -121,6 +126,32 @@ std::variant<Project, err::AcbsErr> Project::parse(
                 compilerLinker = value.str();
             } else if (key.str() == "linkerflags") {
                 compilerLinkerFlags = value.str();
+            } else if (key.str() == "objoutpfx") {
+                compilerObjOutPfx = value.str();
+            } else if (key.str() == "incpfx") {
+                compilerIncPfx = value.str();
+            } else if (key.str() == "srcpfx") {
+                compilerSrcPfx = value.str();
+            } else if (key.str() == "linkeroutpfx") {
+                compilerLinkerOutPfx = value.str();
+            } else if (key.str() == "linkerflagsafter") {
+                std::string val = value.str();
+                while (val.size() && std::isspace(val.front())) {
+                    val.erase(val.begin());
+                }
+                while (val.size() && isspace(val.back())) {
+                    val.pop_back();
+                }
+                if (val == "true") {
+                    compilerLinkerFlagsAfter = true;
+                } else if (val == "false") {
+                    compilerLinkerFlagsAfter = false;
+                } else {
+                    return err::AcbsErr {
+                        .type = err::AcbsErrType::BadValue,
+                        .extraInfo = val + " (line " + std::to_string(ln) + ")"
+                    };
+                }
             } else {
                 return err::AcbsErr {
                     .type = err::AcbsErrType::UnknownKey,
@@ -229,7 +260,12 @@ std::variant<Project, err::AcbsErr> Project::parse(
             .flags = compilerFlags,
             .debugFlags = compilerDebugFlags,
             .linker = compilerLinker,
-            .linkerFlags = compilerLinkerFlags
+            .linkerFlags = compilerLinkerFlags,
+            .objoutpfx = compilerObjOutPfx,
+            .incpfx = compilerIncPfx,
+            .srcpfx = compilerSrcPfx,
+            .linkeroutpfx = compilerLinkerOutPfx,
+            .linkerflagsafter = compilerLinkerFlagsAfter
         }, .project = ProjectSection {
             .name = projectName,
             .isBin = projectIsBin,
