@@ -4,28 +4,27 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL.h>
+#include <err.h>
+#include <tex.h>
+#include <ctx.h>
 
 #define SCREEN_WIDTH        640
 #define SCREEN_HEIGHT       360
 
 int main(int argc, char **argv) {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        fprintf(stderr, "SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+    ctx_res_t ctx_res = ctx_init();
+    if (ctx_res.is_err) {
+        print_err(ctx_res.err);
         return 1;
     }
+    ctx_t ctx = ctx_res.ok;
 
-    SDL_Window *win = SDL_CreateWindow(
-        "SDL Window", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-        SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN
-    );
-    if (!win) {
-        fprintf(stderr, "Window could not be created! SDL Error: %s\n", SDL_GetError());
+    tex_res_t test_img_res = tex_load(ctx.rndrr, "examples/sdlwin/img/test-img.png");
+    if (test_img_res.is_err) {
+        print_err(test_img_res.err);
         return 1;
     }
-
-    SDL_Surface *sfc = SDL_GetWindowSurface(win);
-    SDL_FillRect(sfc, NULL, SDL_MapRGB(sfc->format, 0xFF, 0xFF, 0xFF));
-    SDL_UpdateWindowSurface(win);
+    tex_t test_img = test_img_res.ok;
 
     SDL_Event e;
     bool quit = false;
@@ -39,10 +38,14 @@ int main(int argc, char **argv) {
                     break;
             }
         }
+
+        SDL_RenderClear(ctx.rndrr);
+        tex_draw(ctx.rndrr, &test_img, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        SDL_RenderPresent(ctx.rndrr);
     }
 
-    SDL_DestroyWindow(win);
-    SDL_Quit();
+    tex_cleanup(&test_img);
+    ctx_deinit(&ctx);
     return 0;
 }
 
